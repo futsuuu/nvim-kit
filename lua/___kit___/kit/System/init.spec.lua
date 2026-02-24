@@ -55,6 +55,30 @@ describe('kit.System', function()
       buffer.write('\n3')
       buffer.close()
     end)
+
+    it('should handle close() with long content without trailing newline', function()
+      local consumed = {}
+      local buffer = System.LineBuffering
+        .new({ ignore_empty = false })
+        :create(function(text)
+          table.insert(consumed, text)
+        end)
+      buffer.write('0123456789abcdef')
+      buffer.close()
+      assert.are.same(consumed, { '0123456789abcdef' })
+    end)
+
+    it('should handle close() with NUL byte at position 10 (git stash format)', function()
+      local consumed = {}
+      local buffer = System.LineBuffering
+        .new({ ignore_empty = false })
+        :create(function(text)
+          table.insert(consumed, text)
+        end)
+      buffer.write('stash@{0}\0WIP on main: some stash message')
+      buffer.close()
+      assert.are.same(consumed, { 'stash@{0}\0WIP on main: some stash message' })
+    end)
   end)
   describe('DelimiterBuffering', function()
     it('should buffering by delimiter', function()

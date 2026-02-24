@@ -72,7 +72,7 @@ function System.LineBuffering:create(callback)
       end
     end,
     close = function()
-      for byte, i in buffer.iter_bytes() do
+      for i, byte in buffer.iter_bytes() do
         if byte == bytes['\n'] then
           if buffer.peek(i - 1) == bytes['\r'] then
             callback_wrapped(buffer.get(i - 2))
